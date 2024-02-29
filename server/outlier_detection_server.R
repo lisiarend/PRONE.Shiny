@@ -1,0 +1,454 @@
+# Outlier Detection Server
+
+
+################################ Helper Functions ############################
+
+
+################################## Observer ##################################
+
+observeEvent(input$removeSamplesColumn, {
+  updatePickerInput(session = session, inputId = "removeSamples", choices = colData(reactiveVals$se)[[input$removeSamplesColumn]])
+})
+
+observeEvent(input$removeSamples,{
+  if(length(input$removeSamples) > 0 | !is.null(input$removeSamples)){
+    updateButton(session, "removeSamplesManuallyButton", disabled = FALSE)
+  } else {
+    updateButton(session, "removeSamplesManuallyButton", disabled = TRUE)
+  }
+}, ignoreNULL = FALSE)
+
+observeEvent(input$performOutlierDetectionButton,{
+  condition <- input$pomaGroup
+  method <- input$pomaMethod
+  type <- input$pomaType
+  metadata(reactiveVals$se)$condition <- condition
+  coeff <- input$pomaCoefficient
+  poma_res <- detect_outliers_POMA(reactiveVals$se, ain="log2", method = method, type = type, group = TRUE, coeff = coeff)
+  polygon_plot <- poma_res$polygon_plot
+  distance_plot <- poma_res$distance_boxplot
+  outliers_dt <- as.data.table(poma_res$outliers)
+  reactiveVals$poma_polygon <- polygon_plot
+  reactiveVals$poma_boxplot <- distance_plot
+  reactiveVals$outliers_dt <- outliers_dt
+  # update tab view
+  updateTabsetPanel(inputId = "outlier_plots", selected = "outlier_boxplot")
+})
+
+observeEvent(input$removeSamplesManuallyButton, {
+  samples_to_remove <- input$removeSamples
+  shinyalert(
+    inputId = "confirmSamplesManuallyRemoval",
+    title = "Confirm the removal of samples",
+    text = paste0("You are removing ", length(samples_to_remove), " samples from your data. This step can not be reverted."),
+    size = "s", 
+    closeOnEsc = TRUE,
+    closeOnClickOutside = FALSE,
+    html = FALSE,
+    type = "warning",
+    showConfirmButton = TRUE,
+    showCancelButton = TRUE,
+    confirmButtonText = "Remove Samples Manually",
+    confirmButtonCol = "#53A93F",
+    cancelButtonText = "Cancel",
+    timer = 0,
+    imageUrl = "",
+    animation = TRUE
+  )
+})
+
+observeEvent(input$confirmSamplesManuallyRemoval, {
+  if(input$confirmSamplesManuallyRemoval){
+    samples_to_remove <- input$removeSamples
+    column_rm <- input$removeSamplesColumn
+    
+    reactiveVals$se <- reactiveVals$se[, ! reactiveVals$se[[column_rm]] %in% samples_to_remove]
+    reactiveVals$se_filtered <- reactiveVals$se
+    # run outlier detection without samples --> only if outlier detection have already been run
+    if(!is.null(reactiveVals$polygon_plot)){
+      condition <- input$pomaGroup
+      method <- input$pomaMethod
+      type <- input$pomaType
+      coeff <- input$pomaCoefficient
+      metadata(reactiveVals$se)$condition <- condition
+      poma_res <- detect_outliers_POMA(reactiveVals$se, ain="log2", method = method, type = type, group = TRUE, coeff = coeff)
+      polygon_plot <- poma_res$polygon_plot
+      distance_plot <- poma_res$distance_boxplot
+      outliers_dt <- as.data.table(poma_res$outliers)
+      reactiveVals$polygon_plot <- polygon_plot
+      reactiveVals$distance_plot <- distance_plot
+      reactiveVals$outliers_dt <- outliers_dt
+    }
+    # update
+    updatePickerInput(session = session, inputId = "removeSamples", choices =   colData(reactiveVals$se)[[input$removeSamplesColumn]])
+
+  }
+})
+
+observeEvent(input$removeOutliersButton,{
+  dt <- reactiveVals$outliers_dt
+  shinyalert(
+    inputId = "confirmOutlierRemoval",
+    title = "Confirm the removal of outliers",
+    text = paste0("You are removing ", nrow(dt), " samples from your data. This step can not be reverted."),
+    size = "s", 
+    closeOnEsc = TRUE,
+    closeOnClickOutside = FALSE,
+    html = FALSE,
+    type = "warning",
+    showConfirmButton = TRUE,
+    showCancelButton = TRUE,
+    confirmButtonText = "Remove Outlier Samples",
+    confirmButtonCol = "#53A93F",
+    cancelButtonText = "Cancel",
+    timer = 0,
+    imageUrl = "",
+    animation = TRUE
+  )
+})
+
+observeEvent(input$confirmOutlierRemoval, {
+  if(input$confirmOutlierRemoval){
+    reactiveVals$se <- remove_POMA_outliers(reactiveVals$se, reactiveVals$outliers_dt)
+    reactiveVals$se_filtered <- reactiveVals$se
+    # run outlier detection without outliers
+    condition <- input$pomaGroup
+    method <- input$pomaMethod
+    type <- input$pomaType
+    metadata(reactiveVals$se)$condition <- condition
+    poma_res <- detect_POMA__outliers(reactiveVals$se, ain="log2", method = method, type = type, group = TRUE)
+    polygon_plot <- poma_res$polygon_plot
+    distance_plot <- poma_res$distance_boxplot
+    outliers_dt <- as.data.table(poma_res$outliers)
+    reactiveVals$poma_polygon <- polygon_plot
+    reactiveVals$poma_boxplot <- distance_plot
+    reactiveVals$outliers_dt <- outliers_dt
+    # update
+    updatePickerInput(session = session, inputId = "removeSamples", choices = colData(reactiveVals$se)$Column)
+  }
+})
+
+
+################################## UI Output ##################################
+
+# Outlier Samples Table
+output$pomaOutlierSamples <- renderUI({
+  if(is.null(reactiveVals$outliers_dt)){
+    updateButton(session, "removeOutliersButton", disabled = TRUE)
+    output_box <- fluidRow(
+      column(
+        HTML("<b>First Select Parameters and Click on The Button Perform Outlier Detection</b>"),
+        width = 12
+      )
+    )
+  } else {
+    dt <- reactiveVals$outliers_dt
+    if(nrow(dt) == 0){
+      updateButton(session, "removeOutliersButton", disabled = TRUE)
+      output_box <- fluidRow(
+        column(
+          HTML("<b>No outliers detected !</b>"),
+          width = 12
+        )
+      )
+    } else {
+      updateButton(session, "removeOutliersButton", disabled = FALSE)
+      output_box <- fluidRow(
+        column(
+          renderTable(
+            dt,
+            caption = "Detected Outlier Samples",
+            caption.placement = "top"
+          ),
+          width = 12,
+        )
+      )
+    }
+  }
+  output_box
+})
+
+# POMA Polygon Plot
+output$outlier_polygon_plot <- renderPlot({
+  reactiveVals$poma_polygon
+})
+
+# POMA Boxplot Plot
+output$outlier_boxplot_plot <- renderPlot({
+  reactiveVals$poma_boxplot
+})
+
+# Total Intensity 
+output$outlier_tot_int_tab <- renderUI({
+  req(reactiveVals$se)
+  coldata <- as.data.table(colData(reactiveVals$se))
+  cols <- sapply(coldata, function(x) if(length(unique(x)) == length(x)) return(TRUE) else return(FALSE))
+  label_options <- colnames(coldata)[cols]
+  # TODO:
+  color_by <- colnames(coldata)
+  color_by <- color_by[color_by != "Column"]
+  selected_color_by <- input$outlier_tot_int_colors
+  selected_label_by <- input$outlier_tot_int_labels
+  fluidRow(
+    column(
+      1,
+      div(
+        dropdownButton(
+          tags$h3("Plot Options"),
+          selectizeInput(
+            "outlier_tot_int_colors",
+            "Color By: ",
+            choices = color_by,
+            multiple = FALSE,
+            selected = selected_color_by
+          ),
+          selectizeInput(
+            "outlier_tot_int_labels",
+            "Label By: ",
+            choices = label_options,
+            multiple = FALSE,
+            selected = selected_label_by
+          ),
+          circle = TRUE,
+          status = "custom",
+          icon = tags$i(class = "fa fa-gear", style = "color: white"),
+          width = "400px",
+          tooltip = tooltipOptions(title = "Click to see plot options")
+        ),
+        style = "position:relative; height: 500px;"
+      )
+    ),
+    column(
+      11,
+      shinycssloaders::withSpinner(plotOutput("outlier_tot_int_plot", width = "100%", height = "750px"))
+    )
+  )
+})
+
+output$outlier_tot_int_plot <- renderPlot({
+  req(reactiveVals$se)
+  color_by <- input$outlier_tot_int_colors
+  label_by <- input$outlier_tot_int_labels
+  reactiveVals$outlier_tot_int_plot <- plot_tot_int_samples(reactiveVals$se, ain = "raw", color_by = color_by, label_by = label_by)
+  reactiveVals$outlier_tot_int_plot
+})
+
+# Number of Proteins
+output$outlier_nr_prot_tab <- renderUI({
+  req(reactiveVals$se)
+  coldata <- as.data.table(colData(reactiveVals$se))
+  cols <- sapply(coldata, function(x) if(length(unique(x)) == length(x)) return(TRUE) else return(FALSE))
+  label_options <- colnames(coldata)[cols]
+  # TODO:
+  color_by <- colnames(coldata)
+  color_by <- color_by[color_by != "Column"]
+  selected_color_by <- input$outlier_nr_prot_colors
+  selected_label_by <- input$outlier_nr_prot_labels
+  fluidRow(
+    column(
+      1,
+      div(
+        dropdownButton(
+          tags$h3("Plot Options"),
+          selectizeInput(
+            "outlier_nr_prot_colors",
+            "Color By: ",
+            choices = color_by,
+            multiple = FALSE,
+            selected = selected_color_by
+          ),
+          selectizeInput(
+            "outlier_nr_prot_labels",
+            "Label By: ",
+            choices = label_options,
+            multiple = FALSE,
+            selected = selected_label_by
+          ),
+          circle = TRUE,
+          status = "custom",
+          icon = tags$i(class = "fa fa-gear", style = "color: white"),
+          width = "400px",
+          tooltip = tooltipOptions(title = "Click to see plot options")
+        ),
+        style = "position:relative; height: 500px;"
+      )
+    ),
+    column(
+      11,
+      shinycssloaders::withSpinner(plotOutput("outlier_nr_prot_plot", width = "100%", height = "750px"))
+    )
+  )
+})
+
+output$outlier_nr_prot_plot <- renderPlot({
+  req(reactiveVals$se)
+  color_by <- input$outlier_nr_prot_colors
+  label_by <- input$outlier_nr_tot_labels
+  reactiveVals$outlier_nr_prot_plot <- plot_nr_prot_samples(reactiveVals$se, ain = "raw", color_by = color_by, label_by = label_by)
+  reactiveVals$outlier_nr_prot_plot
+})
+
+output$outlier_poma_polygon_download <- renderUI({
+  req(reactiveVals$poma_polygon)
+  div(
+    downloadButton(
+      outputId = "Outlier_POMA_polygon_download",
+      label = "Download Plot",
+      class = "download-butt",
+      icon = icon("download"),
+    ),
+    style = "float: right; padding-top: 20px;"
+  )
+})
+
+output$outlier_poma_boxplot_download <- renderUI({
+  req(reactiveVals$poma_boxplot)
+  div(
+    downloadButton(
+      outputId = "Outlier_POMA_boxplot_download",
+      label = "Download Plot",
+      class = "download-butt",
+      icon = icon("download"),
+    ),
+    style = "float: right; padding-top: 20px;"
+  )
+})
+
+
+
+output$outlier_nr_prot_download <- renderUI({
+  req(reactiveVals$outlier_nr_prot_plot)
+  div(
+    downloadButton(
+      outputId = "Outlier_nr_prot_download",
+      label = "Download Plot",
+      class = "download-butt",
+      icon = icon("download"),
+    ),
+    style = "float: right; padding-top: 20px;"
+  )
+})
+
+output$outlier_tot_int_download <- renderUI({
+  req(reactiveVals$outlier_tot_int_plot)
+  div(
+    downloadButton(
+      outputId = "Outlier_tot_int_download",
+      label = "Download Plot",
+      class = "download-butt",
+      icon = icon("download"),
+    ),
+    style = "float: right; padding-top: 20px;"
+  )
+})
+
+
+# Visualization Tabs
+output$outlierPlots <- renderUI({
+  if(is.null(reactiveVals$poma_boxplot)){
+    poma_polygon <- HTML("<b>First Select Parameters and Click on The Button</b>")
+    poma_boxplot <- HTML("<b>First Select Parameters and Click on The Button</b>")
+  } else {
+    poma_polygon <- list(plotOutput("outlier_polygon_plot", width="100%", height="500px"),
+                         uiOutput("outlier_poma_polygon_download"))
+    poma_boxplot <- list(plotOutput("outlier_boxplot_plot", width="100%", height="500px"),
+                         uiOutput("outlier_poma_boxplot_download"))
+  }
+
+  tabs <- fluidRow(
+    column(
+      width = 12,
+      tabBox(
+        tabPanel(
+          uiOutput("outlier_tot_int_tab"),
+          div(
+            uiOutput("outlier_tot_int_download"),
+            style = "float: right; padding-top: 20px;"
+          ),
+          value = "outlier_tot_int",
+          title = "Total Protein Intensity"
+        ),
+        tabPanel(
+          uiOutput("outlier_nr_prot_tab"),
+          div(
+            uiOutput("outlier_nr_prot_download"),
+            style = "float: right; padding-top: 20px;"
+          ),
+          value = "outlier_nr_prot",
+          title = "Number of Proteins Per Sample"
+        ),
+        tabPanel(
+          poma_boxplot,
+          value = "outlier_boxplot",
+          title = "POMA:Distance to Centroid"
+        ),
+        tabPanel(
+          poma_polygon,
+          value = "outlier_polygon",
+          title = "POMA:Polygon Plot"
+        ),
+        id = "outlier_plots",
+        title = "Outlier Detection Plots",
+        width = 12
+      )
+    )
+    )
+  
+  tabs
+})
+
+
+output$Outlier_POMA_polygon_download <- downloadHandler(
+  filename = function(){
+    paste0("Outlier_POMA_Polygon", ".pdf")
+  },
+  content = function(file){
+    waiter_show(id = "app",html = tagList(spinner$logo, 
+                                          HTML("<br>Downloading...")), 
+                color=spinner$color)
+    ggsave(file, plot = reactiveVals$poma_polygon, width=12, height=6)
+    waiter_hide(id="app")
+  }
+)
+
+output$Outlier_POMA_boxplot_download <- downloadHandler(
+  filename = function(){
+    paste0("Outlier_POMA_Boxplot", ".pdf")
+  },
+  content = function(file){
+    waiter_show(id = "app",html = tagList(spinner$logo, 
+                                          HTML("<br>Downloading...")), 
+                color=spinner$color)
+    ggsave(file, plot = reactiveVals$poma_boxplot, width=12, height=6)
+    waiter_hide(id="app")
+  }
+)
+
+output$Outlier_tot_int_download <- downloadHandler(
+  filename = function(){
+    paste0("Outlier_Total_Intensity", ".pdf")
+  },
+  content = function(file){
+    waiter_show(id = "app",html = tagList(spinner$logo, 
+                                          HTML("<br>Downloading...")), 
+                color=spinner$color)
+    ggsave(file, plot = reactiveVals$outlier_tot_int_plot, width=12, height=6)
+    waiter_hide(id="app")
+  }
+)
+
+output$Outlier_nr_prot_download <- downloadHandler(
+  filename = function(){
+    paste0("Outlier_Number_Proteins", ".pdf")
+  },
+  content = function(file){
+    waiter_show(id = "app",html = tagList(spinner$logo, 
+                                          HTML("<br>Downloading...")), 
+                color=spinner$color)
+    ggsave(file, plot = reactiveVals$outlier_nr_prot_plot, width=12, height=6)
+    waiter_hide(id="app")
+  }
+)
+
+
+

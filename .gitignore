@@ -47,3 +47,7 @@ po/*~
 
 # RStudio Connect folder
 rsconnect/
+
+# Remove all .DS_Store files
+.DS_Store
+

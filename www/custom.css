@@ -1,0 +1,51 @@
+
+ .skin-black .main-header .navbar {
+     background-color:#3A68AE
+}
+
+ .skin-black .main-header .navbar .sidebar-toggle {
+     color:#ffffff 
+}
+ .skin-black .main-header .navbar .sidebar-toggle:hover {
+     color:#ffffff	;
+     background:#95AAD3 
+}
+
+
+.skin-black .main-header .navbar .nav > li > a {
+     color:#fff 
+}
+ .skin-black .main-header .navbar .nav > li > a:hover {
+     color:#ffffff	;
+     background:#95AAD3 
+}
+
+
+.skin-black .main-header > .logo {
+    background-color:#F3F6FB;
+    color:#95AAD3;
+    border-bottom:0 solid transparent;
+    border-right:1px solid #95AAD3;
+    font-family: "Georgia", Times, "Times New Roman", serif;
+    font-weight: bold;
+    font-size: 24px;
+    height: 50px;
+    letter-spacing:-1px; 
+}
+
+.skin-black .left-side, .skin-black .main-sidebar, .skin-black .wrapper {
+     background-color:#3A68AE;
+}
+
+/* 
+
+*/
+.skin-black .sidebar-menu > li.active > a, .skin-black .sidebar-menu > li:hover > a {   
+     color:#ffffff;
+     background:#95AAD3;
+     border-left-color:#F3F6FB;
+}
+
+.skin-black .sidebar a {
+     color:#ffffff 
+}
