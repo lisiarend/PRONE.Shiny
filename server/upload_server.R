@@ -142,7 +142,12 @@ observeEvent(input$loadDataExample, {
   cols <- sapply(as.data.table(colData(se)), function(x) if(length(unique(x)) == length(x)) return(TRUE) else return(FALSE))
   label_options <- colnames(colData(se))[cols]
   updateSelectizeInput(session = session, inputId = "NAheatmap_label", choices = label_options, selected = label_options[1])
-  updatePickerInput(session = session, inputId = "normVisCondition", choices = colnames(colData(se))[colnames(colData(se)) != "Column"])
+  # only those columns with at least one sample group with more than 1 value
+  choices <- colnames(colData(se))[sapply(as.data.table(colData(se)), function(x) {
+    if(length(unique(x)) < length(x)) return(TRUE) else FALSE
+  })]
+  updatePickerInput(session = session, inputId = "normVisCondition", choices = choices)
+
 
 
   reactiveVals$se_filtered <- se

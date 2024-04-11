@@ -62,7 +62,7 @@ header <-
       ),
       class = "dropdown"
     )
-    
+
   )
 
 
@@ -95,21 +95,21 @@ body <-
       top: 50vh; /*30 pixels from the top*/
       right: 50%; /*48% from the right*/
       }
-      
+
       .btn-custom{
         background-color: #95AAD3 !important;
       }
-      
+
       .download-butt{
       background: #95AAD3 !important;
       color: white;
       }
-      
-      
+
+
       "
     ),
-    waiter_show_on_load(html = tagList(spinner$logo, 
-                                       HTML("<br>Loading App ...")), 
+    waiter_show_on_load(html = tagList(spinner$logo,
+                                       HTML("<br>Loading App ...")),
                         color=spinner$color),
     div(
       id = "loading",
@@ -151,13 +151,13 @@ body <-
         width = 12
       ),
       width = 12)
-  ), 
+  ),
     tabItems(
       welcomeBody,
       uploadBody(),
       filterProteinsBody(),
-      outlierDetectionBody()
-      #normalizationBody(),
+      outlierDetectionBody(),
+      normalizationBody()
       #deAnalysisBody()
     ),
     fluidRow(column(
