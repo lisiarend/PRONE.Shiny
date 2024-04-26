@@ -4,12 +4,13 @@ tab_ids <-
     "filterProteins",
     "outlierDetection",
     "normalization",
-    "de_analysis"
+    "de_analysis",
+    "goodbye"
     )
 
 reactiveVals$current_tab <- 1
 reactiveVals$max_tab <- 1
-reactiveVals$continue <- c(TRUE, FALSE, TRUE, TRUE, TRUE, TRUE)
+reactiveVals$continue <- c(TRUE, FALSE, TRUE, TRUE, TRUE, TRUE, TRUE)
 
 
 tabs <- list(
@@ -38,6 +39,11 @@ tabs <- list(
     "DE Analysis",
     tabName = tab_ids[6],
     icon = icon("object-group")
+  ),
+  menuItem(
+    "Goodbye",
+    tabName = tab_ids[7],
+    icon = icon("hands")
   )
 )
 
@@ -50,7 +56,7 @@ tabs <- list(
 #        inputId = "confirmCompleteNAs",
 #        title = "Protein Groups with NA values for all samples have been identified",
 #        text = paste0(nrow(tmp[[2]])," proteins have only NA values. These proteins should be removed for the analysis."),
-#        size = "s", 
+#        size = "s",
 #        closeOnEsc = TRUE,
 #        closeOnClickOutside = TRUE,
 #        html = FALSE,
@@ -63,8 +69,8 @@ tabs <- list(
 #        timer = 0,
 #        imageUrl = "",
 #        animation = TRUE,
-#        callbackJS = 
-#        
+#        callbackJS =
+#
 #      )
 #    }
 #  }
@@ -96,8 +102,8 @@ observeEvent({
   }
 })
 
-prevNames <- c(" Previous", " Welcome", " Upload Data", " Filter Proteins", " Outlier Detection", " Normalization")
-nextNames <- c(" Upload Data", " Filter Proteins", " Outlier Detection", " Normalization"," DE Analysis")
+prevNames <- c(" Previous", " Welcome", " Upload Data", " Filter Proteins", " Outlier Detection", " Normalization", " DE Analysis")
+nextNames <- c(" Upload Data", " Filter Proteins", " Outlier Detection", " Normalization"," DE Analysis", " Goodbye")
 
 observeEvent(input$tabs, {
   reactiveVals$current_tab <- match(input$tabs, tab_ids)
@@ -117,7 +123,7 @@ observeEvent(input$nextTab, {
   reactiveVals$current_tab <- reactiveVals$current_tab + 1
   if (reactiveVals$current_tab > reactiveVals$max_tab){
     reactiveVals$max_tab <- reactiveVals$current_tab
-  } else 
+  } else
     updateTabItems(session, "tabs", tab_ids[reactiveVals$current_tab]) # here we update in case the new current tab is not a new max tab
   shinyjs::runjs("window.scrollTo(0, 0)")
 })
@@ -136,10 +142,10 @@ observeEvent(input$confirmCompleteNAs, {
 output$sidebar <- renderUI({
   curr_menu <- sidebarMenu(id = "tabs",
                            tabs[1:reactiveVals$max_tab])
-  
+
   # here we update in case the new current tab is also a new max tab
   updateTabItems(session, "tabs", tab_ids[reactiveVals$max_tab])
-  
+
   return(curr_menu)
 })
 
@@ -152,13 +158,13 @@ observeEvent(input$download_data, {
         style = "padding-left: 10px; padding-right: 10px",
         awesomeCheckboxGroup(
           inputId = "download_assays",
-          label = "Select Data You Want To Download:", 
+          label = "Select Data You Want To Download:",
           choices = methods,
           selected = methods
         ),
         radioGroupButtons(
           inputId = "download_assays_type",
-          label = "Select Type of Data To Download:", 
+          label = "Select Type of Data To Download:",
           choices = c("As SummarizedExperiment", "As CSV"),
           selected = ("As SummarizedExperiment"),
           justified = TRUE
@@ -178,7 +184,7 @@ observeEvent(input$download_data, {
                 easyClose = TRUE,
                 footer = modalButton("Close"))
   )
-  
+
 })
 
 observeEvent(input$download_assays, {
@@ -199,8 +205,8 @@ output$downloadData <- downloadHandler(
     ifelse(input$download_assays_type == "As CSV", "Data_CSV.zip", "Data_SE.rds")
   },
   content = function(file){
-    waiter_show(id = "app",html = tagList(spinner$logo, 
-                                          HTML("<br>Downloading...")), 
+    waiter_show(id = "app",html = tagList(spinner$logo,
+                                          HTML("<br>Downloading...")),
                 color=spinner$color)
     if(input$download_assays_type == "As CSV"){
       # Cip Directory
@@ -221,27 +227,29 @@ output$downloadData <- downloadHandler(
       )
     } else {
       # SummarizedExperiment
-      saveRDS(reactiveVals$se, file)
+      se <- PRONE::subset_SE_by_norm(se, input$download_assays)
+      saveRDS(se, file)
     }
     waiter_hide(id="app")
   }
 )
 
-
-observeEvent(input$dependencies_modal, {
-  showModal(
-    modalDialog(title = "Dependencies",
-                shinycssloaders::withSpinner(dataTableOutput("licenseTable")),
-                easyClose = TRUE,
-                footer = modalButton("Close"))
-  )
-})
-
-output$licenseTable <- renderDataTable({
+output$licenseTable <- DT::renderDataTable({
   deps_table <- sapply(unique(renv::dependencies()$Package), packageDescription, fields="License")
   DT::datatable(data.frame(Package = names(deps_table), License = deps_table),
                 rownames = FALSE,
                 options = list(pageLength = 10, searching = TRUE))
 })
+
+observeEvent(input$dependencies_modal, {
+  showModal(
+    modalDialog(title = "Dependencies",
+                DT::dataTableOutput("licenseTable"),
+                easyClose = TRUE,
+                footer = modalButton("Close"))
+  )
+})
+
+
 
 

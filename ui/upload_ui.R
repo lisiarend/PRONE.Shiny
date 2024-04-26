@@ -1,9 +1,13 @@
 uploadBody <- function() {
   box_height <- "20em"
   
-  exampleDataVector <- c( "Tuberculosis" = "data/tuberculosis_se.rds",
-                          "Li et al. on hPDLCs" = "data/li_et_al.rds"
-                         )
+  exampleDataVector <- c( "Li et al. on hPDLCs (TMT)" = "data/li_et_al.rds",
+                          "Vehmas et al. on AROM + mice (LFQ)" = "data/mouse_liver_cytochrome_P450_se.rds"
+                        )
+  
+  exampleDataDescription <- c("Li et al. on hPDLCs (TMT)" = "Li et al.",
+                              "Vehmas et al. on AROM + mice (LFQ)" = "Vehmans et al.")
+
   
   dataExampleBox <- fluidRow(
     width=12,

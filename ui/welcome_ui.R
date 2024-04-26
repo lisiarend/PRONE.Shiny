@@ -1,7 +1,7 @@
 welcomeBody <-  tabItem(tabName = "welcome",
                         fluidRow(
                           shinydashboard::box(fluidRow(
-                            column(width = 12,
+                            column(width = 7,
                                    div(
                                      HTML(
                                        "
@@ -16,18 +16,24 @@ welcomeBody <-  tabItem(tabName = "welcome",
                                             However, since the origin of these biases is usually unknown, selecting an appropriate normalization technique for a given dataset is challenging.
                                             </br>
                                             </br>
-                                            Here, we present PRONE, a user-friendly Shiny app that employs state-of-the-art normalization methods and enables simple evaluation of
+                                            Here, we present PRONE, a user-friendly R package that comes with a Shiny app that employs state-of-the-art normalization methods and enables simple evaluation of
                                             normalization methods through both quantitative and qualitative evaluation metrics and DE analysis.
+                                            </br>
+                                            </br>
+                                            A detailed description of the PRONE package that is also useful for the navigation through the Shiny app is available <a href='https://lisiarend.github.io/PRONE.R/'>here</a>.
+                                            </br>
+                                            </br>
+                                            If you are using either the R package or the Shiny app, please cite the following paper: TODO
                                             "
                                      ),
                                      style = "font-size: large;"
                                    )
                             ),
                             column(
-                              width = 12,
+                              width = 5,
                               img(
-                                src = "PRONE_big.png",
-                                height = "170px",
+                                src = "PRONE_Workflow.png",
+                                height = "500px",
                                 width = "auto"
                               ),
                               style = "vertical-align: middle; text-align:center;"

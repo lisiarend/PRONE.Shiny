@@ -12,7 +12,7 @@ library(shinycssloaders)
 library(ggplot2)
 library(SummarizedExperiment)
 library(S4Vectors)
-library(PRONE.R)
+library(PRONE)
 library(data.table)
 
 jscode <- "shinyjs.closewindow = function() { window.close(); }"
@@ -28,11 +28,21 @@ spinner <- list(logo = list(spin_loaders(id = 5, color = "#95AAD3")), color="rgb
 
 header <-
   dashboardHeader(
-    title = span(img(src="PRONE_small.png", height = "40px")),
+    title = span(img(src="PRONE_Text_Logo.png", height = "60px")),
     tags$li(
       actionLink(
         inputId = "download_data",
         label = div(icon("download", style = "color:white;"), " Download Data"),
+      ),
+      class = "dropdown"
+    ),
+    tags$li(
+      a(
+        div(icon("circle-info", style = "color:white;"), " Vignette"),
+        href="https://lisiarend.github.io/PRONE/",
+        title="",
+        icon = icon("circle-info"),
+        target = "_blank"
       ),
       class = "dropdown"
     ),
@@ -115,7 +125,7 @@ body <-
       id = "loading",
       fluidRow(
         shinydashboard::box(fluidRow(
-          column(width = 12,
+          column(width = 7,
                  div(
                    HTML(
                      "
@@ -130,35 +140,42 @@ body <-
                                             However, since the origin of these biases is usually unknown, selecting an appropriate normalization technique for a given dataset is challenging.
                                             </br>
                                             </br>
-                                            Here, we present PRONE, a user-friendly Shiny app that employs state-of-the-art normalization methods and enables simple evaluation of
+                                            Here, we present PRONE, a user-friendly R package that comes with a Shiny app that employs state-of-the-art normalization methods and enables simple evaluation of
                                             normalization methods through both quantitative and qualitative evaluation metrics and DE analysis.
+                                            </br>
+                                            </br>
+                                            A detailed description of the PRONE package that is also useful for the navigation through the Shiny app is available <a href='https://lisiarend.github.io/PRONE.R/'>here</a>.
+                                            </br>
+                                            </br>
+                                            If you are using either the R package or the Shiny app, please cite the following paper: TODO
                                             "
                    ),
                    style = "font-size: large;"
                  )
           ),
           column(
-            width = 12,
+            width = 5,
             img(
-              src = "PRONE_big.png",
-              height = "170px",
+              src = "PRONE_Workflow.png",
+              height = "500px",
               width = "auto"
             ),
             style = "vertical-align: middle; text-align:center;"
           )
         ),
-        title = h2("Welcome to PRONE, the PROteomics Normalization Evaluater."),
+        title = h2("Welcome to PRONE, the PROteomics Normalization Evaluator."),
         width = 12
-      ),
-      width = 12)
+        ),
+        width = 12)
   ),
     tabItems(
       welcomeBody,
       uploadBody(),
       filterProteinsBody(),
       outlierDetectionBody(),
-      normalizationBody()
-      #deAnalysisBody()
+      normalizationBody(),
+      deAnalysisBody(),
+      goodbyeBody
     ),
     fluidRow(column(
       6,

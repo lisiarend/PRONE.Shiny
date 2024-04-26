@@ -296,7 +296,7 @@ output$norm_boxplots_plot <- renderPlot({
   req(reactiveVals$se)
   color_by <- input$boxplots_color
   ain <- input$normVisAin
-  reactiveVals$norm_boxplots <- PRONE.R::plot_boxplots(reactiveVals$se, ain = ain, color_by = color_by)
+  reactiveVals$norm_boxplots <- plot_boxplots(reactiveVals$se, ain = ain, color_by = color_by)
   reactiveVals$norm_boxplots
 })
 
@@ -698,7 +698,6 @@ output$norm_pev_download <- renderUI({
 
 output$norm_pev_plot <- renderPlot({
   req(reactiveVals$se)
-  browser()
   reactiveVals$PEV_plot_intra <- plot_intragroup_PEV(se = reactiveVals$se, ain = input$normVisAin, condition = input$normVisCondition, diff = as.logical(input$PEV_diff))
   reactiveVals$PEV_plot_intra
 })
