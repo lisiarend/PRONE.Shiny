@@ -17,7 +17,7 @@ jobs:
     steps:
     - uses: actions/checkout@v4
     - name: Build the Docker image
-      run: docker build -t ${{ env.IMAGE_NAME }} .
+      run: docker build --no-cache -t ${{ env.IMAGE_NAME }} .
 
   push_to_registry:
     name: Push Docker image to Docker hub

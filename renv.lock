@@ -3,6 +3,26 @@
     "Version": "4.4.0",
     "Repositories": [
       {
+        "Name": "BioCsoft",
+        "URL": "https://bioconductor.org/packages/3.19/bioc"
+      },
+      {
+        "Name": "BioCann",
+        "URL": "https://bioconductor.org/packages/3.19/data/annotation"
+      },
+      {
+        "Name": "BioCexp",
+        "URL": "https://bioconductor.org/packages/3.19/data/experiment"
+      },
+      {
+        "Name": "BioCworkflows",
+        "URL": "https://bioconductor.org/packages/3.19/workflows"
+      },
+      {
+        "Name": "BioCbooks",
+        "URL": "https://bioconductor.org/packages/3.19/books"
+      },
+      {
         "Name": "CRAN",
         "URL": "https://packagemanager.posit.co/cran/latest"
       }
@@ -14,7 +34,7 @@
   "Packages": {
     "AnnotationDbi": {
       "Package": "AnnotationDbi",
-      "Version": "1.65.2",
+      "Version": "1.66.0",
       "Source": "Bioconductor",
       "Repository": "Bioconductor 3.19",
       "Requirements": [
@@ -30,7 +50,7 @@
         "stats",
         "stats4"
       ],
-      "Hash": "54aa9182e3acb70079e5d9bf0715ae18"
+      "Hash": "b7df9c597fb5533fc8248d73b8c703ac"
     },
     "AnnotationFilter": {
       "Package": "AnnotationFilter",
@@ -262,8 +282,8 @@
     "DelayedArray": {
       "Package": "DelayedArray",
       "Version": "0.29.9",
-      "Source": "Repository",
-      "Repository": "https://bioconductor.org/packages/3.19/bioc",
+      "Source": "Bioconductor",
+      "Repository": "Bioconductor 3.19",
       "Requirements": [
         "BiocGenerics",
         "IRanges",
@@ -628,8 +648,8 @@
     "POMA": {
       "Package": "POMA",
       "Version": "1.13.26",
-      "Source": "Repository",
-      "Repository": "https://bioconductor.org/packages/3.19/bioc",
+      "Source": "Bioconductor",
+      "Repository": "Bioconductor 3.19",
       "Requirements": [
         "ComplexHeatmap",
         "DESeq2",
@@ -807,8 +827,8 @@
     "ROTS": {
       "Package": "ROTS",
       "Version": "1.31.0",
-      "Source": "Repository",
-      "Repository": "https://bioconductor.org/packages/3.19/bioc",
+      "Source": "Bioconductor",
+      "Repository": "Bioconductor 3.19",
       "Requirements": [
         "Biobase",
         "R",
@@ -966,7 +986,7 @@
     },
     "S4Vectors": {
       "Package": "S4Vectors",
-      "Version": "0.41.7",
+      "Version": "0.42.0",
       "Source": "Bioconductor",
       "Repository": "Bioconductor 3.19",
       "Requirements": [
@@ -977,7 +997,7 @@
         "stats4",
         "utils"
       ],
-      "Hash": "53d2f396eb9ebeb2589c2051258e909f"
+      "Hash": "245ac721ca6088200392ea5251db9e3c"
     },
     "SQUAREM": {
       "Package": "SQUAREM",
@@ -3829,8 +3849,8 @@
     "sva": {
       "Package": "sva",
       "Version": "3.51.0",
-      "Source": "Repository",
-      "Repository": "https://bioconductor.org/packages/3.19/bioc",
+      "Source": "Bioconductor",
+      "Repository": "Bioconductor 3.19",
       "Requirements": [
         "BiocParallel",
         "R",
