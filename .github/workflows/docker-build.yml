@@ -6,7 +6,7 @@ on:
 
 env:
   REGISTRY: docker.io
-  IMAGE_NAME: ${{ github.repository }} # <account>/<repo>
+  IMAGE_NAME: lisiarend/prone.shiny
 
 jobs:
 
