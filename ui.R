@@ -125,7 +125,7 @@ body <-
       id = "loading",
       fluidRow(
         shinydashboard::box(fluidRow(
-          column(width = 7,
+          column(width = 12,
                  div(
                    HTML(
                      "
@@ -154,7 +154,7 @@ body <-
                  )
           ),
           column(
-            width = 5,
+            width = 12,
             img(
               src = "PRONE_Workflow.png",
               height = "500px",

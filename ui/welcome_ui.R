@@ -1,7 +1,7 @@
 welcomeBody <-  tabItem(tabName = "welcome",
                         fluidRow(
                           shinydashboard::box(fluidRow(
-                            column(width = 7,
+                            column(width = 12,
                                    div(
                                      HTML(
                                        "
@@ -30,7 +30,7 @@ welcomeBody <-  tabItem(tabName = "welcome",
                                    )
                             ),
                             column(
-                              width = 5,
+                              width = 12,
                               img(
                                 src = "PRONE_Workflow.png",
                                 height = "500px",
