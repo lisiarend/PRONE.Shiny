@@ -17,7 +17,8 @@ RUN apt-get update -qq && apt-get -y --no-install-recommends install \
     libglpk-dev \
     libssl-dev \
     libnetcdf-dev \
-    cmake
+    cmake \
+    libmpfr-dev
 
 ## update system libraries
 RUN apt-get update && \
