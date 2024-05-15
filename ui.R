@@ -49,7 +49,7 @@ header <-
     tags$li(
       a(
         div(icon("question", style = "color:white;"), " Issues"),
-        href="https://github.com/ProteomicsAnalyst/RShiny/issues",
+        href="https://github.com/lisiarend/PRONE.Shiny/issues",
         title="",
         icon = icon("question"),
         target = "_blank"
@@ -59,7 +59,7 @@ header <-
     tags$li(
       a(
         div(icon("github", style = "color:white;"), " Github"),
-        href="https://github.com/ProteomicsAnalyst/RShiny",
+        href="https://github.com/lisiarend/PRONE.Shiny",
         title="",
         target = "_blank"
       ),
@@ -125,7 +125,7 @@ body <-
       id = "loading",
       fluidRow(
         shinydashboard::box(fluidRow(
-          column(width = 12,
+          column(width = 6,
                  div(
                    HTML(
                      "
@@ -144,7 +144,7 @@ body <-
                                             normalization methods through both quantitative and qualitative evaluation metrics and DE analysis.
                                             </br>
                                             </br>
-                                            A detailed description of the PRONE package that is also useful for the navigation through the Shiny app is available <a href='https://lisiarend.github.io/PRONE.R/'>here</a>.
+                                            A detailed description of the PRONE package that is also useful for the navigation through the Shiny app is available <a href='https://lisiarend.github.io/PRONE/'>here</a>.
                                             </br>
                                             </br>
                                             If you are using either the R package or the Shiny app, please cite the following paper: TODO
@@ -154,11 +154,11 @@ body <-
                  )
           ),
           column(
-            width = 12,
+            width = 6,
             img(
               src = "PRONE_Workflow.png",
-              height = "500px",
-              width = "auto"
+              height = "auto",
+              width = "100%"
             ),
             style = "vertical-align: middle; text-align:center;"
           )

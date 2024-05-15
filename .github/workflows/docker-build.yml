@@ -2,7 +2,7 @@ name: Build and Push Docker Image
 
 on:
   push:
-    branches: [ "docker-build" ]
+    branches: [ "docker-build" ] # TODO: change branch
 
 env:
   IMAGE_NAME: lisiarend/prone.shiny # TODO: change image name
