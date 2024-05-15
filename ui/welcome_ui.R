@@ -1,7 +1,7 @@
 welcomeBody <-  tabItem(tabName = "welcome",
                         fluidRow(
                           shinydashboard::box(fluidRow(
-                            column(width = 12,
+                            column(width = 6,
                                    div(
                                      HTML(
                                        "
@@ -20,7 +20,7 @@ welcomeBody <-  tabItem(tabName = "welcome",
                                             normalization methods through both quantitative and qualitative evaluation metrics and DE analysis.
                                             </br>
                                             </br>
-                                            A detailed description of the PRONE package that is also useful for the navigation through the Shiny app is available <a href='https://lisiarend.github.io/PRONE.R/'>here</a>.
+                                            A detailed description of the PRONE package that is also useful for the navigation through the Shiny app is available <a href='https://lisiarend.github.io/PRONE/'>here</a>.
                                             </br>
                                             </br>
                                             If you are using either the R package or the Shiny app, please cite the following paper: TODO
@@ -30,11 +30,11 @@ welcomeBody <-  tabItem(tabName = "welcome",
                                    )
                             ),
                             column(
-                              width = 12,
+                              width = 6,
                               img(
                                 src = "PRONE_Workflow.png",
-                                height = "500px",
-                                width = "auto"
+                                height = "auto",
+                                width = "100%"
                               ),
                               style = "vertical-align: middle; text-align:center;"
                             )

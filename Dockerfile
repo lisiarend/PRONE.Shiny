@@ -16,7 +16,9 @@ RUN apt-get update -qq && apt-get -y --no-install-recommends install \
     libcurl4-openssl-dev \
     libglpk-dev \
     libssl-dev \
-    libnetcdf-dev
+    libnetcdf-dev \
+    cmake \
+    libmpfr-dev
 
 ## update system libraries
 RUN apt-get update && \
