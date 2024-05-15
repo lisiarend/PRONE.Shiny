@@ -46,6 +46,8 @@ COPY ./ui ./ui
 COPY ./server ./server
 COPY ./www ./www
 
+RUN ls -la ./www
+
 # expose port
 EXPOSE 3838
 

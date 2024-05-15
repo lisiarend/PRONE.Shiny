@@ -5,10 +5,10 @@ goodbyeBody <-  tabItem(tabName = "goodbye",
                                    div(
                                      HTML("We sincerely appreciate your trust in our tool to assist you in achieving reliable and accurate proteomics data normalization and performing proteomics data analysis."),
 
-                                     HTML("We are committed to continuously improving PRONE and eagerly anticipate your valuable feedback, which is crucial for driving future enhancements. Therefore, please feel free to write an issue to the GitHub repository."),
+                                     HTML("</br>We are committed to continuously improving PRONE and eagerly anticipate your valuable feedback, which is crucial for driving future enhancements. Therefore, please feel free to write an issue to the GitHub repository."),
 
-                                     HTML("How to cite PRONE?"),
-                                     HTML("... coming soon ..."),
+                                     HTML("</br>How to cite PRONE?"),
+                                     HTML("</br>... coming soon ..."),
                                      style = "font-size: large;"
                                    )
                             ),
