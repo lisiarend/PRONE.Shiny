@@ -46,12 +46,10 @@ COPY ./ui ./ui
 COPY ./server ./server
 COPY ./www ./www
 
-RUN ls -la ./www
+RUN ls -la /srv/PRONE_app/www
 
 # expose port
 EXPOSE 3838
-
-RUN dir -s
 
 # run app on container start
 CMD ["R", "-e", "shiny::runApp(host = '0.0.0.0', port = 3838)"]
