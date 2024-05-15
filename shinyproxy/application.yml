@@ -25,7 +25,7 @@ proxy:
     container-cmd: ["R", "-e", "shiny::runApp(host='0.0.0.0', port=3838)"]
     container-network: prone_sp-net # TODO: change this to the correct network
 path
-  container-image: lisiarend/prone_shiny # TODO: change this to the path of your image and version tag on Dockerhub
+  container-image: lisiarend/prone_shiny:latest # TODO: change this to the path of your image and version tag on Dockerhub
 
 logging:
  file:
