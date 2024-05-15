@@ -45,6 +45,8 @@ COPY ./data ./data
 COPY ./ui ./ui
 COPY ./server ./server
 COPY ./www ./www
+COPY ./www/PRONE_Workflow.png ./www/PRONE_Workflow.png
+
 
 RUN ls -la /srv/PRONE_app/www
 
