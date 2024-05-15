@@ -467,7 +467,7 @@ output$currentData <- renderInfoBox({
                HTML(exampleDataDescription[names(exampleDataVector[exampleDataVector == metadata(reactiveVals$se)$exampleData])])
         ),
         column(4, list(overview_current)),
-        column(8, metadatalist),
+        column(7, metadatalist),
         style='padding-top:10px;'
       ),
       title = "Selected Data", status = status)
