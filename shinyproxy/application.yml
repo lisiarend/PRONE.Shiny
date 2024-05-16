@@ -23,7 +23,7 @@ proxy:
       display-name: PRONE
       description: Proteomics Normalization Evaluator
       container-cmd: ["R", "-e", "shiny::runApp(host='0.0.0.0', port=3838)"]
-      container-network: prone_sp-net
+      container-network: proneshiny_sp-net
       container-image: lisiarend/prone.shiny:latest
       
 
@@ -31,7 +31,7 @@ logging:
   file:
     name: shinyproxy.log
   level:
-    root: DEBUG
+    root: ERROR
 
 server:
   useForwardHeaders: true
