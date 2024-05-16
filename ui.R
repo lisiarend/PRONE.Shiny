@@ -202,4 +202,4 @@ body <-
   )
 
 
-ui <- tags$div(id = "app", dashboardPage(header, sidebar, body, title = "App", skin = "black"))
+ui <- tags$div(id = "app", dashboardPage(header, sidebar, body, title = "PRONE", skin = "black"))
