@@ -27,3 +27,5 @@ logging:
 
 server:
   useForwardHeaders: true
+  servlet:
+    context-path: /prone
