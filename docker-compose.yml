@@ -1,20 +1,10 @@
-version: '3.5'
-
 services:
-  shinyproxy:
-    build: ./shinyproxy
-    restart: unless-stopped
-    expose:
-      - 8080
-    networks:      
-      sp-net:
-        ipv4_address: 172.16.213.2
-    volumes:
-      - /var/run/docker.sock:/var/run/docker.sock
-  nginx: 
-    image: nginx:1.17.5
-    restart: unless-stopped
+  PRONE:
+    build:
+      context: .
+      dockerfile: Dockerfile
     ports:
+<<<<<<< HEAD
       - 8025:80 
     networks:
       sp-net:
@@ -31,3 +21,7 @@ networks:
     driver: default
     config:
       - subnet: 172.16.213.0/24
+=======
+      - 3838:3838
+    image: lisiarend/prone.shiny:0.0.1
+>>>>>>> 0c60ed9c7976bde4a379442873689c793c2093fa

@@ -5,15 +5,9 @@ library(shinydashboard)
 library(shinyjs)
 library(shinyWidgets)
 library(shinyBS)
-library(waiter)
 library(shinyalert)
 library(waiter)
 library(shinycssloaders)
-library(ggplot2)
-library(SummarizedExperiment)
-library(S4Vectors)
-library(PRONE)
-library(data.table)
 
 jscode <- "shinyjs.closewindow = function() { window.close(); }"
 
@@ -202,4 +196,4 @@ body <-
   )
 
 
-ui <- tags$div(id = "app", dashboardPage(header, sidebar, body, title = "App", skin = "black"))
+ui <- tags$div(id = "app", dashboardPage(header, sidebar, body, title = "PRONE", skin = "black"))
