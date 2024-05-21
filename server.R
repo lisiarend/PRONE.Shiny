@@ -3,6 +3,12 @@
 # Define server logic required to draw a histogram
 server <- function(input, output, session) {
   
+  library(ggplot2)
+  library(SummarizedExperiment)
+  library(S4Vectors)
+  library(PRONE)
+  library(data.table)
+  
   # make reactiveValues and server-wide variables
   reactiveVals <- reactiveValues()
   

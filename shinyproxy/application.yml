@@ -1,6 +1,6 @@
 proxy:
   port: 8080
-  landing-page: /app/prone # app name
+  landing-page: /app/prone
   favicon-path: ./favicon.png
   authentication: none
   admin-groups: admins
@@ -18,19 +18,20 @@ proxy:
     groups: admins
   docker:
     internal-networking: true
- specs:
-  - id: prone # TODO: change this to ID of app
-    display-name: PRONE
-    description: Proteomics Normalization Evaluator
-    container-cmd: ["R", "-e", "shiny::runApp(host='0.0.0.0', port=3838)"]
-    container-network: prone_sp-net # TODO: change this to the correct network
-path
-  container-image: lisiarend/prone_shiny:latest # TODO: change this to the path of your image and version tag on Dockerhub
+  specs:
+    - id: prone
+      display-name: PRONE
+      description: Proteomics Normalization Evaluator
+      container-cmd: ["R", "-e", "shiny::runApp(host='0.0.0.0', port=3838)"]
+      container-network: proneshiny_sp-net
+      container-image: lisiarend/prone.shiny:latest
+      
 
 logging:
- file:
-  name: shinyproxy.log
- level:
-  root: DEBUG
+  file:
+    name: shinyproxy.log
+  level:
+    root: ERROR
+
 server:
- useForwardHeaders: true
+  useForwardHeaders: true
