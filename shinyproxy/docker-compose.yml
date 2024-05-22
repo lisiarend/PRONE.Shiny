@@ -7,7 +7,7 @@ services:
     networks:
       - prone-net
     group_add:
-      - 129 # Can be determined by running `getent group docker | cut -d: -f3` on the host
+      - "131" # Can be determined by running `getent group docker | cut -d: -f3` on the host
     ports:
       - 8025:8080
 
