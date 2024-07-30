@@ -12,6 +12,7 @@ reactiveVals$current_tab <- 1
 reactiveVals$max_tab <- 1
 reactiveVals$continue <- c(TRUE, FALSE, TRUE, TRUE, TRUE, TRUE, TRUE)
 
+reactiveVals$selected_palette <- RColorBrewer::brewer.pal(8, "Set2")
 
 tabs <- list(
   menuItem("Welcome",
@@ -251,5 +252,87 @@ observeEvent(input$dependencies_modal, {
 })
 
 
+observeEvent(input$change_colors, {
+  if(is.null(reactiveVals$se)){
+    output <- HTML("No Data Uploaded")
+  } else {
+    methods <- names(assays(reactiveVals$se))
+    output <- fluidRow(
+      style = "padding-left: 10px; padding-right: 10px",
+      HTML("Select the color palette you want to use for plotting. Some of the plots have hard coded colors because they do not depend on the data and colors represent predefined categories."),
+      column(
+        width = 4,
+        radioGroupButtons(
+          inputId = "chosenColorPalette",
+          label = "Select the Color Palette You Want to Use:",
+          choices = c("Colorblind1", "Colorblind2: Wong", "Colorblind3: Tol bright", "Colorblind4: Tol vibrant", "Colorblind5: Tol muted", "RColorBrewer: Set1", "RColorBrewer: Set2", "RColorBrewer: Set3", "RColorBrewer: Pastel1", "RColorBrewer: Pastel2", "RColorBrewer: Paired", "RColorBrewer: Dark2", "RColorBrewer: Accent"),
+          selected = "RColorBrewer: Set2",
+          justified = FALSE,
+          direction = "vertical"
+        )
+      ),
+      column(
+        width = 8,
+        plotOutput("showColorPalette", width = "100%", height = "500px")
+      ),
+      column(
+        width = 10,
+        bsButton(
+          "confirmPaletteSelection",
+          " Confirm Palette Selection ",
+          icon = icon("check"),
+          style = "success",
+        )
+      )
+    )
+  }
+  showModal(
+    modalDialog(title = "Select Colors",
+                output,
+                easyClose = TRUE,
+                footer = modalButton("Close"))
+  )
+})
 
+output$showColorPalette <- renderPlot({
+  if(input$chosenColorPalette == "Colorblind1"){
+    reactiveVals$chosen_palette <- c("#ff6db6", "#004949", "#db6d00",  "#B2DF8A", 
+                                       "#FDB462", "#490092", "#009999", "#8f4e00", 
+                                       "#ffdf4d", "#171723","#b66dff")
+  }else if(input$chosenColorPalette == "Colorblind2: Wong"){
+    reactiveVals$chosen_palette <- c("#999999", "#E69F00", "#56B4E9", "#009E73", 
+                                       "#F0E442", "#0072B2", "#D55E00", "#CC79A7")
+  }else if(input$chosenColorPalette == "Colorblind3: Tol bright"){
+    reactiveVals$chosen_palette <- c('#4477AA', '#EE6677', '#228833', '#CCBB44', 
+                                       '#66CCEE', '#AA3377', '#BBBBBB')
+  }else if(input$chosenColorPalette == "Colorblind4: Tol vibrant"){
+    reactiveVals$chosen_palette <- c('#EE7733', '#0077BB', '#33BBEE', '#EE3377', 
+                                       '#CC3311', '#009988', '#BBBBBB')
+  }else if(input$chosenColorPalette == "Colorblind5: Tol muted"){
+    reactiveVals$chosen_palette <- c('#CC6677', '#332288', '#DDCC77', '#117733', 
+                                       '#88CCEE', '#882255', '#44AA99', '#999933', 
+                                       '#AA4499', '#DDDDDD')
+  }else if(input$chosenColorPalette  == "RColorBrewer: Set1"){
+    reactiveVals$chosen_palette <- RColorBrewer::brewer.pal(9, "Set1")
+  }else if(input$chosenColorPalette  == "RColorBrewer: Set2"){
+    reactiveVals$chosen_palette <- RColorBrewer::brewer.pal(8, "Set2")
+  }else if(input$chosenColorPalette  == "RColorBrewer: Set3"){
+    reactiveVals$chosen_palette <- RColorBrewer::brewer.pal(12, "Set3")
+  }else if(input$chosenColorPalette  == "RColorBrewer: Pastel1"){
+    reactiveVals$chosen_palette <- RColorBrewer::brewer.pal(9, "Pastel1")
+  }else if(input$chosenColorPalette  == "RColorBrewer: Pastel2"){
+    reactiveVals$chosen_palette <- RColorBrewer::brewer.pal(8, "Pastel2")
+  }else if(input$chosenColorPalette  == "RColorBrewer: Paired"){
+    reactiveVals$chosen_palette <- RColorBrewer::brewer.pal(12, "Paired")
+  }else if(input$chosenColorPalette  == "RColorBrewer: Dark2"){
+    reactiveVals$chosen_palette <- RColorBrewer::brewer.pal(8, "Dark2")
+  }else if(input$chosenColorPalette  == "RColorBrewer: Accent"){
+    reactiveVals$chosen_palette <- RColorBrewer::brewer.pal(8, "Accent")
+  }
+  return(scales::show_col(reactiveVals$chosen_palette))
+})
 
+observeEvent(input$confirmPaletteSelection,{
+  reactiveVals$selected_palette <- reactiveVals$chosen_palette
+  removeModal()
+})

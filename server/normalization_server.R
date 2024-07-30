@@ -48,7 +48,7 @@ observeEvent(input$performNormalization,{
                                     on_raw = on_raw,
                                     gamma.0 = input$normMethodsGamma,
                                     reduce_correlation_by = input$normMethodsNormics_reduce_corr,
-                                    top_x = input$normMethods_top_x,
+                                    top_x = input$normMethodsNormics_top_x,
                                     NormicsVSN_quantile = input$normMethodsNormics_quantile,
                                     VSN_quantile = input$normMethodsVSN_quantile
                                     )
@@ -199,7 +199,7 @@ output$normMethodsParameter <- renderUI({
           step = 0.1
         )
       )
-      parameters_ui[["VSN_qunatile"]] <- pVSN_quantile
+      parameters_ui[["VSN_quantile"]] <- pVSN_quantile
       parameters_ui[["VSN_quantile_popover"]] <- normalizationVSNQuantilePopover
     }
     if("NormicsMedian" %in% input$normMethods | "NormicsVSN" %in% input$normMethods){
@@ -296,7 +296,12 @@ output$norm_boxplots_plot <- renderPlot({
   req(reactiveVals$se)
   color_by <- input$boxplots_color
   ain <- input$normVisAin
-  reactiveVals$norm_boxplots <- plot_boxplots(reactiveVals$se, ain = ain, color_by = color_by)
+  nlevels <- length(unique(colData(reactiveVals$se)[[color_by]]))
+  custom_colors <- reactiveVals$selected_palette
+  if(nlevels > length(custom_colors)){
+    custom_colors <- grDevices::colorRampPalette(colors = reactiveVals$selected_palette)(nlevels)
+  }
+  reactiveVals$norm_boxplots <- plot_boxplots(reactiveVals$se, ain = ain, color_by = color_by) + scale_fill_manual(name = color_by, values = custom_colors)
   reactiveVals$norm_boxplots
 })
 
@@ -370,7 +375,12 @@ output$norm_densities_plot <- renderPlot({
   req(reactiveVals$se)
   color_by <- input$densities_color
   ain <- input$normVisAin
-  reactiveVals$norm_densities <- plot_densities(reactiveVals$se, ain = ain, color_by = color_by)
+  nlevels <- length(unique(colData(reactiveVals$se)[[color_by]]))
+  custom_colors <- reactiveVals$selected_palette
+  if(nlevels > length(custom_colors)){
+    custom_colors <- grDevices::colorRampPalette(colors = reactiveVals$selected_palette)(nlevels)
+  }
+  reactiveVals$norm_densities <- plot_densities(reactiveVals$se, ain = ain, color_by = color_by) + scale_color_manual(name = color_by, values = custom_colors)
   reactiveVals$norm_densities
 })
 
@@ -501,10 +511,15 @@ output$norm_PCA_plot <- renderPlot({
   if(facet_by == "No Faceting"){
     facet_by <- NULL
   }
+  nlevels <- length(unique(colData(reactiveVals$se)[[color_by]]))
+  custom_colors <- reactiveVals$selected_palette
+  if(nlevels > length(custom_colors)){
+    custom_colors <- grDevices::colorRampPalette(colors = reactiveVals$selected_palette)(nlevels)
+  }
   if(length(ain) != 1){
-    reactiveVals$norm_pca <- plot_PCA(reactiveVals$se, ain = ain, label_by = label_by, shape_by = shape_by, color_by = color_by, ellipse = ellipses)
+    reactiveVals$norm_pca <- plot_PCA(reactiveVals$se, ain = ain, label_by = label_by, shape_by = shape_by, color_by = color_by, ellipse = ellipses) + scale_color_manual(name = color_by, values = custom_colors)
   } else {
-    reactiveVals$norm_pca <- plot_PCA(reactiveVals$se, ain = ain, label_by = label_by, shape_by = shape_by, color_by = color_by, facet_by = facet_by, ellipse = ellipses, facet_norm = FALSE)[[1]]
+    reactiveVals$norm_pca <- plot_PCA(reactiveVals$se, ain = ain, label_by = label_by, shape_by = shape_by, color_by = color_by, facet_by = facet_by, ellipse = ellipses, facet_norm = FALSE)[[1]] + scale_color_manual(name = color_by, values = custom_colors)
   }
   reactiveVals$norm_pca
 })
@@ -540,7 +555,7 @@ output$norm_global_PCA_tab <- renderUI({
   req(reactiveVals$se)
   coldata <- as.data.table(colData(reactiveVals$se))
   shape_by <- colnames(coldata)
-  metadata(se)$condition <- input$normVisCondition
+  metadata(reactiveVals$se)$condition <- input$normVisCondition
   # TODO:
   shape_by <- shape_by[shape_by != "Column"]
   selected_shape_by <- input$global_pca_shape
@@ -619,7 +634,12 @@ output$norm_global_PCA_plot <- renderPlot({
     facet_by <- NULL
   }
   se <- generate_complete_SE(reactiveVals$se, ain = ain)
-  reactiveVals$global_norm_pca <- plot_PCA(se, ain = c("all"), shape_by = shape_by, label_by = label_by, color_by = "Normalization", facet_by = facet_by, ellipse = ellipses, facet_norm = FALSE)[[1]]
+  nlevels <- length(unique(colData(reactiveVals$se)[[color_by]]))
+  custom_colors <- reactiveVals$selected_palette
+  if(nlevels > length(custom_colors)){
+    custom_colors <- grDevices::colorRampPalette(colors = reactiveVals$selected_palette)(nlevels)
+  }
+  reactiveVals$global_norm_pca <- plot_PCA(se, ain = c("all"), shape_by = shape_by, label_by = label_by, color_by = "Normalization", facet_by = facet_by, ellipse = ellipses, facet_norm = FALSE)[[1]] + scale_color_manual(name = "Normalization", values = custom_colors)
   reactiveVals$global_norm_pca
 })
 
@@ -698,7 +718,12 @@ output$norm_pev_download <- renderUI({
 
 output$norm_pev_plot <- renderPlot({
   req(reactiveVals$se)
-  reactiveVals$PEV_plot_intra <- plot_intragroup_PEV(se = reactiveVals$se, ain = input$normVisAin, condition = input$normVisCondition, diff = as.logical(input$PEV_diff))
+  nlevels <- length(input$normVisAin)
+  custom_colors <- reactiveVals$selected_palette
+  if(nlevels > length(custom_colors)){
+    custom_colors <- grDevices::colorRampPalette(colors = reactiveVals$selected_palette)(nlevels)
+  }
+  reactiveVals$PEV_plot_intra <- plot_intragroup_PEV(se = reactiveVals$se, ain = input$normVisAin, condition = input$normVisCondition, diff = as.logical(input$PEV_diff)) + scale_fill_manual(name = "Normalization", values = custom_colors)
   reactiveVals$PEV_plot_intra
 })
 
@@ -763,7 +788,12 @@ output$norm_pcv_download <- renderUI({
 
 output$norm_pcv_plot <- renderPlot({
   req(reactiveVals$se)
-  reactiveVals$PCV_plot_intra <- plot_intragroup_PCV(reactiveVals$se, ain = input$normVisAin, condition = input$normVisCondition, diff = as.logical(input$PCV_diff))
+  nlevels <- length(input$normVisAin)
+  custom_colors <- reactiveVals$selected_palette
+  if(nlevels > length(custom_colors)){
+    custom_colors <- grDevices::colorRampPalette(colors = reactiveVals$selected_palette)(nlevels)
+  }
+  reactiveVals$PCV_plot_intra <- plot_intragroup_PCV(reactiveVals$se, ain = input$normVisAin, condition = input$normVisCondition, diff = as.logical(input$PCV_diff)) + scale_fill_manual(name = "Normalization", values = custom_colors)
   reactiveVals$PCV_plot_intra
 })
 
@@ -828,7 +858,12 @@ output$norm_pmad_download <- renderUI({
 
 output$norm_pmad_plot <- renderPlot({
   req(reactiveVals$se)
-  reactiveVals$PMAD_plot_intra <- plot_intragroup_PMAD(se = reactiveVals$se, ain = input$normVisAin, condition = input$normVisCondition, diff = as.logical(input$PMAD_diff))
+  nlevels <- length(input$normVisAin)
+  custom_colors <- reactiveVals$selected_palette
+  if(nlevels > length(custom_colors)){
+    custom_colors <- grDevices::colorRampPalette(colors = reactiveVals$selected_palette)(nlevels)
+  }
+  reactiveVals$PMAD_plot_intra <- plot_intragroup_PMAD(se = reactiveVals$se, ain = input$normVisAin, condition = input$normVisCondition, diff = as.logical(input$PMAD_diff)) + scale_fill_manual(name = "Normalization", values = custom_colors)
   reactiveVals$PMAD_plot_intra
 })
 
@@ -897,7 +932,12 @@ output$norm_intr_corr_download <- renderUI({
 
 output$norm_intr_corr_plot <- renderPlot({
   req(reactiveVals$se)
-  reactiveVals$intr_corr_plot_intra <- plot_intragroup_correlation(reactiveVals$se, ain = input$normVisAin, condition = input$normVisCondition, method = input$intr_corr_method)
+  nlevels <- length(input$normVisAin)
+  custom_colors <- reactiveVals$selected_palette
+  if(nlevels > length(custom_colors)){
+    custom_colors <- grDevices::colorRampPalette(colors = reactiveVals$selected_palette)(nlevels)
+  }
+  reactiveVals$intr_corr_plot_intra <- plot_intragroup_correlation(reactiveVals$se, ain = input$normVisAin, condition = input$normVisCondition, method = input$intr_corr_method) + scale_fill_manual(name = "Normalization", values = custom_colors)
   reactiveVals$intr_corr_plot_intra
 })
 

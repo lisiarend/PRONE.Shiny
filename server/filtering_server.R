@@ -149,13 +149,19 @@ output$NA_heatmap_plot <- renderPlot({
   show_row_dend <- as.logical(input$NAheatmap_row_dend)
   show_col_dend <- as.logical(input$NAheatmap_col_dend)
   if(color_by != ""){
+    nlevels <- length(unique(colData(reactiveVals$se)[[color_by]]))
+    custom_colors <- reactiveVals$selected_palette
+    if(nlevels > length(custom_colors)){
+      custom_colors <- grDevices::colorRampPalette(colors = reactiveVals$selected_palette)(nlevels)
+    }
     reactiveVals$NA_heatmap <- plot_NA_heatmap(se = reactiveVals$se_filtered,
                                               color_by = color_by,
                                               label_by = label_by,
                                               cluster_samples = cluster_samples,
                                              cluster_proteins = cluster_proteins,
                                               show_row_dend = show_row_dend,
-                                             show_column_dend = show_col_dend)
+                                             show_column_dend = show_col_dend,
+                                             col_vector = custom_colors)
   }
   reactiveVals$NA_heatmap
 })
@@ -194,7 +200,7 @@ output$NA_heatmap_handler_download <- downloadHandler(
                                           HTML("<br>Downloading...")), 
                 color=spinner$color)
     pdf(file, width = 12, height = 8)
-    draw(reactiveVals$NA_heatmap)
+    ComplexHeatmap::draw(reactiveVals$NA_heatmap)
     dev.off()
     waiter_hide(id="app")
   }

@@ -11,7 +11,7 @@ outlierDetectionBody <- function() {
 
   outlierConditionPopover <- bsPopover( id = "outlierConditionInfo",
                                    title = "Column name of metadata containing the information about the group/condition of the samples.",
-                                   content = "POMA is a multivariate outlier detection method, and outlier samples are calculated based on their distance to their group members.")
+                                   content = "POMA is a multivariate outlier detection method, and outlier samples are calculated based on their distance to their group members. This vector should contain at least 2 unique values!")
 
   outlierCoeffPopover <- bsPopover( id = "outlierCoeffInfo",
                                         title = "Classical univariate outlier detection formula Q3 + x * IQR.",
@@ -44,7 +44,7 @@ outlierDetectionBody <- function() {
                ),
                pickerInput(
                  "pomaGroup",
-                 label = span("Select the Condition for Multi-Variate Outlier Detection.", tags$i(class = "fa fa-circle-info", style = "color: rgb(0,166,90)"), id = "outlierConditionInfo"),
+                 label = span("Select the Condition for Multi-Variate Outlier Detection (Non-unique).", tags$i(class = "fa fa-circle-info", style = "color: rgb(0,166,90)"), id = "outlierConditionInfo"),
                  choices = NULL,
                  multiple = FALSE
                ),

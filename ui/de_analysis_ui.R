@@ -83,7 +83,7 @@ deAnalysisBody <- function() {
   
   deSelectionBox <- shinydashboard::box(
     width = 12,
-    height = "35em",
+    height = "40em",
     title = "Run DE Analysis",
     fluidRow(
       column(

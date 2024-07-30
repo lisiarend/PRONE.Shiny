@@ -19,6 +19,9 @@ observeEvent(input$removeSamples,{
 }, ignoreNULL = FALSE)
 
 observeEvent(input$performOutlierDetectionButton,{
+  waiter_show(id = "app",html = tagList(spinner$logo,
+                                        HTML("<br>Outlier Detection in Progress...<br>Please be patient"),
+  ), color=spinner$color)
   condition <- input$pomaGroup
   method <- input$pomaMethod
   type <- input$pomaType
@@ -28,11 +31,13 @@ observeEvent(input$performOutlierDetectionButton,{
   polygon_plot <- poma_res$polygon_plot
   distance_plot <- poma_res$distance_boxplot
   outliers_dt <- as.data.table(poma_res$outliers)
+  reactiveVals$poma_condition <- condition
   reactiveVals$poma_polygon <- polygon_plot
   reactiveVals$poma_boxplot <- distance_plot
   reactiveVals$outliers_dt <- outliers_dt
   # update tab view
   updateTabsetPanel(inputId = "outlier_plots", selected = "outlier_boxplot")
+  waiter_hide(id="app")
 })
 
 observeEvent(input$removeSamplesManuallyButton, {
@@ -74,6 +79,7 @@ observeEvent(input$confirmSamplesManuallyRemoval, {
       poma_res <- detect_outliers_POMA(reactiveVals$se, ain="log2", method = method, type = type, group = TRUE, coeff = coeff)
       polygon_plot <- poma_res$polygon_plot
       distance_plot <- poma_res$distance_boxplot
+      reactiveVals$poma_condition <- condition
       outliers_dt <- as.data.table(poma_res$outliers)
       reactiveVals$polygon_plot <- polygon_plot
       reactiveVals$distance_plot <- distance_plot
@@ -170,12 +176,24 @@ output$pomaOutlierSamples <- renderUI({
 
 # POMA Polygon Plot
 output$outlier_polygon_plot <- renderPlot({
-  reactiveVals$poma_polygon
+  condition <- reactiveVals$poma_condition
+  nlevels <- length(unique(colData(reactiveVals$se)[[condition]]))
+  custom_colors <- reactiveVals$selected_palette
+  if(nlevels > length(custom_colors)){
+    custom_colors <- grDevices::colorRampPalette(colors = reactiveVals$selected_palette)(nlevels)
+  }
+  reactiveVals$poma_polygon + scale_fill_manual(name = condition, values = custom_colors)
 })
 
 # POMA Boxplot Plot
 output$outlier_boxplot_plot <- renderPlot({
-  reactiveVals$poma_boxplot
+  condition <- reactiveVals$poma_condition
+  nlevels <- length(unique(colData(reactiveVals$se)[[condition]]))
+  custom_colors <- reactiveVals$selected_palette
+  if(nlevels > length(custom_colors)){
+    custom_colors <- grDevices::colorRampPalette(colors = reactiveVals$selected_palette)(nlevels)
+  }
+  reactiveVals$poma_boxplot + scale_fill_manual(name = condition, values = custom_colors)
 })
 
 # Total Intensity 
@@ -229,7 +247,12 @@ output$outlier_tot_int_plot <- renderPlot({
   req(reactiveVals$se)
   color_by <- input$outlier_tot_int_colors
   label_by <- input$outlier_tot_int_labels
-  reactiveVals$outlier_tot_int_plot <- plot_tot_int_samples(reactiveVals$se, ain = "raw", color_by = color_by, label_by = label_by)
+  nlevels <- length(unique(colData(reactiveVals$se)[[color_by]]))
+  custom_colors <- reactiveVals$selected_palette
+  if(nlevels > length(custom_colors)){
+    custom_colors <- grDevices::colorRampPalette(colors = reactiveVals$selected_palette)(nlevels)
+  }
+  reactiveVals$outlier_tot_int_plot <- plot_tot_int_samples(reactiveVals$se, ain = "raw", color_by = color_by, label_by = label_by) + scale_fill_manual(name = color_by, values = custom_colors)
   reactiveVals$outlier_tot_int_plot
 })
 
@@ -284,7 +307,12 @@ output$outlier_nr_prot_plot <- renderPlot({
   req(reactiveVals$se)
   color_by <- input$outlier_nr_prot_colors
   label_by <- input$outlier_nr_tot_labels
-  reactiveVals$outlier_nr_prot_plot <- plot_nr_prot_samples(reactiveVals$se, ain = "raw", color_by = color_by, label_by = label_by)
+  nlevels <- length(unique(colData(reactiveVals$se)[[color_by]]))
+  custom_colors <- reactiveVals$selected_palette
+  if(nlevels > length(custom_colors)){
+    custom_colors <- grDevices::colorRampPalette(colors = reactiveVals$selected_palette)(nlevels)
+  }
+  reactiveVals$outlier_nr_prot_plot <- plot_nr_prot_samples(reactiveVals$se, ain = "raw", color_by = color_by, label_by = label_by) + scale_fill_manual(name = color_by, values = custom_colors)
   reactiveVals$outlier_nr_prot_plot
 })
 

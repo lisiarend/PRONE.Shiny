@@ -1,4 +1,4 @@
-
+options(shiny.maxRequestSize=100*1024^2)
 
 # Define server logic required to draw a histogram
 server <- function(input, output, session) {

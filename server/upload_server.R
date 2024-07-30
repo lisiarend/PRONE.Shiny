@@ -8,7 +8,7 @@ exampleDataVector <- c( "Li et al. on hPDLCs (TMT)" = "data/li_et_al.rds",
 exampleDataDescription <- c("Li et al. on hPDLCs (TMT)" = "Li et al. Dynamic proteomic profiling of human periodontal ligament stem cells during osteogenic differentiation. Stem Cell Research & Therapy 12.1 (Feb. 2021), p. 98. doi: <a href='https://doi.org/10.1186/s13287-020-02123-6'>10.1186/s13287-020-02123-6</a>.
                             </br>
                             </br>
-                            Li et al. conducted a TMT experiment to assess the temporal protein expression changes during osteogenic differentiation of human periodontal ligament stem cells (hPDLSCs) at four di↵erent time points. The four time points (D0, D3, D7, and D14) with triplicate biological replication were analyzed on three 6-plex TMT sets. The same pooled reference sample was labeled with Label 130 and included in each TMT plex (Table C.1). LC-MS/MS analysis was performed on a Q Exactive mass spectrometer that was coupled to an Easy-nanoLC. MS/MS spectra were searched using Mascot, embedded into Proteome Discoverer.
+                            Li et al. conducted a TMT experiment to assess the temporal protein expression changes during osteogenic differentiation of human periodontal ligament stem cells (hPDLSCs) at four different time points. The four time points (D0, D3, D7, and D14) with triplicate biological replication were analyzed on three 6-plex TMT sets. The same pooled reference sample was labeled with Label 130 and included in each TMT plex. LC-MS/MS analysis was performed on a Q Exactive mass spectrometer that was coupled to an Easy-nanoLC. MS/MS spectra were searched using Mascot, embedded into Proteome Discoverer.
                             ",
                             "Vehmas et al. on AROM + mice (LFQ)" = "Vehmas et al. Liver lipid metabolism is altered by increased circulating estrogen to androgen ratio in male mouse. J. Proteomics. Bd. 133. S. 66–75. Feb. 2016. doi: <a href='https://doi.org/10.1016/j.jprot.2015.12.009'>10.1016/j.jprot.2015.12.009</a>.
                             </br> 
@@ -40,6 +40,8 @@ loadData <- function(data, md, metadata_column, protein_column, gene_column, ref
   if(!batch_bool){
     batch_column <- NULL
   }
+  nlevels <- sort(sapply(md, function(x) length(unique(x))))
+  md <- md[, names(nlevels)]
   se <- PRONE::load_data(data, md, protein_column = protein_column, gene_column = gene_column, ref_samples = ref_samples, batch_column = batch_column, condition_column = NULL, label_column = NULL)
   return(se)
 }
@@ -167,6 +169,9 @@ observeEvent(input$loadDataExample, {
   updatePickerInput(session = session, inputId = "normVisCondition", choices = choices)
   reactiveVals$se_filtered <- se
   reactiveVals$curr_NA_thr <- 0
+  reactiveVals$poma_polygon <- NULL
+  reactiveVals$poma_boxplot <- NULL
+  reactiveVals$outliers_dt <- NULL
   status <- "success"
   if(status == "success"){
     upload_tab <- which(tab_ids == "upload")
@@ -217,8 +222,11 @@ observeEvent(input$loadDataSE, {
   if(!is.null(reactiveVals$data$se)){
     se <- reactiveVals$data$se
   }
+  
   reactiveVals$se <- se
-
+  reactiveVals$poma_polygon <- NULL
+  reactiveVals$poma_boxplot <- NULL
+  reactiveVals$outliers_dt <- NULL
   updatePickerInput(session = session, inputId = "filterProteinsColumn", choices = colnames(rowData(se))) # only show those columns that are not the intensities
   updatePickerInput(session = session, inputId = "pomaGroup", choices = colnames(colData(se))[colnames(colData(se)) != "Column"])
   updatePickerInput(session = session, inputId = "removeSamplesColumn", choices = colnames(colData(se)), selected = colnames(colData(se))[1])
@@ -287,6 +295,9 @@ observeEvent(input$loadDataOwn, {
     {
       se <- loadData(reactiveVals$data$upload$data, reactiveVals$data$upload$md, input$columnName, input$protIDsColumn, input$geneNamesColumn, input$refSamplesBool, input$refSamples, input$batchBool, input$batchColumn)
       reactiveVals$se <- se
+      reactiveVals$poma_polygon <- NULL
+      reactiveVals$poma_boxplot <- NULL
+      reactiveVals$outliers_dt <- NULL
       updatePickerInput(session = session, inputId = "filterProteinsColumn", choices = colnames(rowData(se))) # only show those columns that are not the intensities
       updatePickerInput(session = session, inputId = "pomaGroup", choices = colnames(colData(se))[colnames(colData(se)) != "Column"])
       updatePickerInput(session = session, inputId = "removeSamplesColumn", choices = colnames(colData(se)), selected = colnames(colData(se))[1])

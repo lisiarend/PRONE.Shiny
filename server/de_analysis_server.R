@@ -140,6 +140,7 @@ observeEvent(input$performDEAnalysis, {
 observeEvent(input$deColComparison, {
   if(!is.null(input$deColComparison)){
     se <- reactiveVals$se
+    metadata(se)$condition <- input$deColComparison
     if(!is.null(S4Vectors::metadata(se)$refs)){
       se <- remove_reference_samples(se)
     }
@@ -316,7 +317,13 @@ output$de_intersections_plot <- renderPlot({
   if(length(input$deVisAin) == 1){
     res <- plot_upset_DE(reactiveVals$de_results, ain = input$deVisAin, comparison = input$deVisComparison, plot_type = "single")[[1]]
   } else {
+    nlevels <- length(input$deVisComparison)
+    custom_colors <- reactiveVals$selected_palette
+    if(nlevels > length(custom_colors)){
+      custom_colors <- grDevices::colorRampPalette(colors = reactiveVals$selected_palette)(nlevels)
+    }
     res <- plot_upset_DE(reactiveVals$de_results, ain = input$deVisAin, comparison = input$deVisComparison, plot_type = "stacked")
+    res$upset[[2]] <- res$upset[[2]] + ggplot2::scale_fill_manual(name = "Comparison", values = custom_colors)
   }
   reactiveVals$de_intersection_plot <- res$upset
   reactiveVals$de_intersection_plot
@@ -459,8 +466,13 @@ output$DE_Intersection_Jaccard_Plot_Download <- downloadHandler(
 
 # DE Analysis Overview
 output$de_overview_bar_tab <- renderUI({
+  de_results <- reactiveVals$de_results
+  de_res <- de_results[(de_results$Assay %in% input$deVisAin & de_results$Comparison %in% input$deVisComparison),]
+  de_res <- de_res[de_res$Change != "No Change",]
   if(is.null(input$deVisAin) || is.null(input$deVisComparison)){
     HTML("First Select Parameters and Click on The Button Perform DE Analysis")
+  } else if(nrow(de_res) == 0){
+    HTML("No DE Results for the Selected Parameters")
   } else {
     fluidRow(
       column(
@@ -497,10 +509,21 @@ output$deOverviewBarPlot <- renderPlot({
   req(reactiveVals$de_results)
   ain <- input$deVisAin
   comp <- input$deVisComparison
+  type <- input$deOverviewBarPlotType
   if(length(ain) == 1){
     reactiveVals$de_overview_bar_plot <- plot_overview_DE_bar(reactiveVals$de_results, ain = ain, comparison = comp, plot_type = "single")[[1]]
   } else {
-    reactiveVals$de_overview_bar_plot <- plot_overview_DE_bar(reactiveVals$de_results, ain = ain, comparison = comp, plot_type = input$deOverviewBarPlotType)
+    de_overview_bar_plot <- plot_overview_DE_bar(reactiveVals$de_results, ain = ain, comparison = comp, plot_type = type)
+    if(input$deOverviewBarPlotType != "facet_comp"){
+      nlevels <- length(comp)
+      custom_colors <- reactiveVals$selected_palette
+      if(nlevels > length(custom_colors)){
+        custom_colors <- grDevices::colorRampPalette(colors = reactiveVals$selected_palette)(nlevels)
+      }
+      reactiveVals$de_overview_bar_plot <- de_overview_bar_plot + scale_fill_manual(name = "Comparison", values = custom_colors)
+    } else {
+      reactiveVals$de_overview_bar_plot <- de_overview_bar_plot
+    }
   }
   reactiveVals$de_overview_bar_plot
 })
@@ -532,10 +555,17 @@ output$DE_Overview_Bar_download <- downloadHandler(
 )
 
 output$de_overview_tile_tab <- renderUI({
+  de_results <- reactiveVals$de_results
   if(is.null(input$deVisAin) || is.null(input$deVisComparison)){
     HTML("First Select Parameters and Click on The Button Perform DE Analysis")
   } else {
+    de_res <- de_results[(de_results$Assay %in% input$deVisAin & de_results$Comparison %in% input$deVisComparison),]
+    de_res <- de_res[de_res$Change != "No Change",]
+    if(nrow(de_res)==0){
+      HTML("No DE Results for the Selected Parameters")
+    } else {
     shinycssloaders::withSpinner(plotOutput("deOverviewTilePlot", width = "100%", height = "500px"))
+    }
   }
 })
 
@@ -828,10 +858,17 @@ output$de_volcano_plot <- renderPlot({
 # Heatmap
 
 output$de_heatmap_tab <- renderUI({
+  de_results <- reactiveVals$de_results
   if(is.null(input$deVisAin) || is.null(input$deVisComparison)){
     HTML("First Select Parameters and Click on The Button Perform DE Analysis")
   } else if(length(input$deVisComparison) == 1 && length(input$deVisAin) == 1){
-    shinycssloaders::withSpinner(plotOutput("de_heatmap_plot",  width = "100%", height = "750px"))
+    de_res <- de_results[(de_results$Assay %in% input$deVisAin & de_results$Comparison %in% input$deVisComparison),]
+    de_res <- de_res[de_res$Change != "No Change",]
+    if(nrow(de_res)==0){
+      HTML("No DE Results for the Selected Parameters")
+    } else {
+      shinycssloaders::withSpinner(plotOutput("de_heatmap_plot",  width = "100%", height = "750px"))
+    }
   } else {
     HTML("This plot is only available when a single comparison and a single normalization method is selected.")
   }
@@ -859,7 +896,7 @@ output$DE_Heatmap_Plot_download <- downloadHandler(
                                           HTML("<br>Downloading...")),
                 color=spinner$color)
     pdf(file, width = 12, height = 8)
-    draw(reactiveVals$de_heatmap)
+    ComplexHeatmap::draw(reactiveVals$de_heatmap)
     dev.off()
     waiter_hide(id="app")
   }
@@ -873,7 +910,8 @@ output$de_heatmap_plot <- renderPlot({
   condition <- reactiveVals$de_condition
   if(!is.null(ain)){
     if((length(ain)==1) && (length(comparison) == 1)){
-      reactiveVals$de_heatmap <- plot_heatmap_DE(se = reactiveVals$se, de_res = de_results, ain = ain, condition = condition, comparison = comparison)[[ain]]
+      custom_colors <- reactiveVals$selected_palette
+      reactiveVals$de_heatmap <- plot_heatmap_DE(se = reactiveVals$se, de_res = de_results, ain = ain, condition = condition, comparison = comparison, col_vector = custom_colors)[[ain]]
       reactiveVals$de_heatmap
     } else {
       reactiveVals$de_heatmap <- NULL

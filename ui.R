@@ -25,6 +25,13 @@ header <-
     title = span(img(src="PRONE_Text_Logo.png", height = "60px")),
     tags$li(
       actionLink(
+        inputId = "change_colors",
+        label = div(icon("palette", style = "color:white;"), " Change Colors"),
+      ),
+      class = "dropdown"
+    ),
+    tags$li(
+      actionLink(
         inputId = "download_data",
         label = div(icon("download", style = "color:white;"), " Download Data"),
       ),
