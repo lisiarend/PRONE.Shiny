@@ -18,7 +18,9 @@ There are three possibilities to run the R Shiny app PRONE:
 
 ### Public Web Interface
 
-The public web interface is available at [https://exbio.wzw.tum.de/prone/](https://exbio.wzw.tum.de/prone/).
+The public web interface is available at [https://exbio.wzw.tum.de/prone/](https://exbio.wzw.tum.de/prone/). 
+
+Currently, the docker image [lisiarend/prone.shiny:v0.0.1](https://hub.docker.com/layers/lisiarend/prone.shiny/v0.0.1/images/sha256-5175a29c9c6e34e7c1bfd677816d8cc30be085aff263a5b43c4e9f2c0ac6965b?context=repo) is running.
 
 ### Docker Image
 
@@ -26,12 +28,21 @@ Additionally, a docker image for our shiny app is publicly available on Docker H
 
 ``` bash
 docker pull lisiarend/prone.shiny:latest
+
+# OR for a specific version
+
+docker pull lisiarend/prone.shiny:v0.0.1 
 ```
 
 You can run the app in a single container using
 
 ``` bash
 docker run --rm -p 3838:3838 lisiarend/prone.shiny:latest
+
+# OR for a specific version
+
+docker run --rm -p 3838:3838 lisiarend/prone.shiny:v0.0.1
+
 ```
 
 If you go to localhost:3838, you can see our Shiny app.
