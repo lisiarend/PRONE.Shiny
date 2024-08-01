@@ -31,8 +31,8 @@ jobs:
       - name: Build and push
         uses: docker/bake-action@v4
         with:
+          tags:lisiarend/prone.shiny:${{ steps.meta.outputs.tags }}
           push: ${{ github.event_name != 'pull_request' }}
           set: |
-            *.tags=${{ steps.meta.outputs.tags }}
             *.cache-from=type=gha
             *.cache-to=type=gha,mode=max
