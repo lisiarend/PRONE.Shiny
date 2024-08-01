@@ -5,4 +5,4 @@ services:
       dockerfile: Dockerfile
     ports:
       - 3838:3838
-    image: lisiarend/prone.shiny:0.0.1
+    image: lisiarend/prone.shiny:${IMAGE_TAG:-latest}
