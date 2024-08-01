@@ -124,6 +124,7 @@ normalizationBody <- function() {
                     <li>Remove batch effects method of limma package (limBE) - to adjust for TMT batrches </li>
                   </ul>"
                 ),
+                HTML("<b> NormicsVSN and NormicsMedian take longer than the other methods. You can also perform normalization using the R package and then load your object in the Shiny app!</b>"),
                 HTML("<b>Attention !</b> IRS and limBE can only be performed if the experiment was performed in batches. In addition, IRS requires the existence of one reference sample per batch!")
                 ),
              ))

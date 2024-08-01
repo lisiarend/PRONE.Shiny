@@ -41,7 +41,7 @@ loadData <- function(data, md, metadata_column, protein_column, gene_column, ref
     batch_column <- NULL
   }
   nlevels <- sort(sapply(md, function(x) length(unique(x))))
-  md <- md[, names(nlevels)]
+  md <- md[, names(nlevels), with = FALSE]
   se <- PRONE::load_data(data, md, protein_column = protein_column, gene_column = gene_column, ref_samples = ref_samples, batch_column = batch_column, condition_column = NULL, label_column = NULL)
   return(se)
 }
@@ -237,7 +237,7 @@ observeEvent(input$loadDataSE, {
   updatePickerInput(session = session, inputId = "deColComparison", choices = colnames(colData(se))[colnames(colData(se)) != "Column"])
   updateSelectizeInput(session = session, inputId = "NAheatmap_color", choices = colnames(colData(se)), selected = colnames(colData(se))[2])
   updatePickerInput(session = session, inputId = "deDEqMSColumn", choices = colnames(rowData(se)))
-    # check unique columns (for labeling rows of heatmap)
+  # check unique columns (for labeling rows of heatmap)
   cols <- sapply(as.data.table(colData(se)), function(x) if(length(unique(x)) == length(x)) return(TRUE) else return(FALSE))
   label_options <- colnames(colData(se))[cols]
   updateSelectizeInput(session = session, inputId = "NAheatmap_label", choices = label_options, selected = label_options[1])
