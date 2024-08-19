@@ -42,6 +42,10 @@ loadData <- function(data, md, metadata_column, protein_column, gene_column, ref
   }
   nlevels <- sort(sapply(md, function(x) length(unique(x))))
   md <- md[, names(nlevels), with = FALSE]
+  # make columns characters
+  for(column in names(md)){
+    md[[column]] <- as.character(md[[column]])
+  }
   se <- PRONE::load_data(data, md, protein_column = protein_column, gene_column = gene_column, ref_samples = ref_samples, batch_column = batch_column, condition_column = NULL, label_column = NULL)
   return(se)
 }

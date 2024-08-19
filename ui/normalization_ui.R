@@ -154,11 +154,6 @@ normalizationBody <- function() {
             value = "norm_PCA",
             title = "PCA"
           ),
-          tabPanel(
-            uiOutput("norm_global_PCA_tab"),
-            value = "norm_global_PCA",
-            title = span("Global PCA", tags$i(class = "fa fa-circle-info", style = "color: rgb(0,166,90)"), id = "normalizationGlobalPCAInfo")
-          ),
           normalizationGlobalPCAPopover,
           id = "qual_norm_plots",
           title = "Qualitative Normalization Plots",
@@ -252,7 +247,7 @@ normalizationBody <- function() {
         <br />
         This app offers multiple normalization methods and also allows for the combination of different normalization methods. Classical visualizations,
         such as boxplots, PCA plots, and density plots are generated for each normalization method applied. Additionally, visualizations that depict
-        intergroup variations and similarities are provided to assess the performance of individual normalization methods.
+        intragroup variations and similarities are provided to assess the performance of individual normalization methods.
         <br />
         It is not necessary to choose a single normalization method at this point, as the subsequent tab allows for the performance of differential
         expression analysis using multiple normalization methods, providing an additional means to evalute the performance of these methods."

@@ -228,7 +228,7 @@ output$downloadData <- downloadHandler(
       )
     } else {
       # SummarizedExperiment
-      se <- PRONE::subset_SE_by_norm(se, input$download_assays)
+      se <- PRONE::subset_SE_by_norm(reactiveVals$se, input$download_assays)
       saveRDS(se, file)
     }
     waiter_hide(id="app")
