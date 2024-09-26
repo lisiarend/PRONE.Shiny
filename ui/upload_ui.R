@@ -72,7 +72,7 @@ uploadBody <- function() {
     bsPopover(
       id = "dataFileInfo",
       title = "A CSV or Txt file with the proteomics data.",
-      content = "A file containing the intensities of proteins for multiple samples (samples specified in metadata file). For example, the output file proteinGroups.txt of MaxQuant.</b>"
+      content = "A file containing the RAW intensities of proteins for multiple samples (samples specified in metadata file). For example, the output file proteinGroups.txt of MaxQuant.</b>"
     )
   
   columnNamePopover <- 
@@ -146,7 +146,7 @@ uploadBody <- function() {
       width = 6,
       fileInput(
         "dataFile",
-        span("Choose Proteomics Data File ", tags$i(class = "fa fa-circle-info", style = "color: rgb(0,166,90)"), id = "dataFileInfo"),
+        span("Choose Proteomics Data File (Raw)", tags$i(class = "fa fa-circle-info", style = "color: rgb(0,166,90)"), id = "dataFileInfo"),
         width = "100%",
         multiple = FALSE,
         accept = c(".csv", ".txt"),

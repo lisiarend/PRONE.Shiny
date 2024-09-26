@@ -460,7 +460,7 @@ output$currentData <- renderInfoBox({
     overview_current <- c(overview_current, list(refSamplesText))
   }
   if(!is.null(batchColumn)){
-    overview_current <- c(overview_current, list(h5(HTML("<p style=\"color:grey;\">Batch</p>")), batchColumn))
+    overview_current <- c(overview_current, list(h5(HTML("<p style=\"color:grey;\">Batch Column</p>")), batchColumn))
   }
   metadatalist <- NULL
   if(is.null(overview_current)){

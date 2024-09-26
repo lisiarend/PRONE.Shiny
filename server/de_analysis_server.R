@@ -82,58 +82,78 @@ observeEvent(input$performDEAnalysis, {
   robust <- input$deLimmaRobust
 
   # run DE analysis
-  de_results <- run_DE(reactiveVals$se,
-                       comparisons = comparisons,
-                       ain = ain,
-                       condition = condition,
-                       DE_method = method,
-                       logFC = logfc_b,
-                       logFC_up = logfc,
-                       logFC_down = -logfc,
-                       p_adj = padj_b,
-                       alpha = p,
-                       K = K,
-                       B = B,
-                       DEqMS_PSMs_column = DEqMS_column)
-
-  # save current settings
-  de_current <- data.table("Method" = c(method),
-                           "Input Data" = c(ain),
-                           "Comparisons" = c(comparisons)
-  )
-  if(method == "ROTS"){
-    de_current$K <- c(K)
-    de_current$B <- c(B)
-  }
-  if(method == "DEqMS"){
-    de_current$DEqMS_column <- c(DEqMS_column)
-  }
-  if(logfc_b){
-    de_current[ , ":=" ("LogFC Thr" = logfc)]
-  }
-  if(padj_b){
-    de_current[ , ":=" ("P.Adj Thr" = p)]
-  } else {
-    de_current[ , ":=" ("P.Value Thr" = p)]
-  }
-
-  reactiveVals$de_current <- de_current
-  reactiveVals$de_results <- de_results
-  reactiveVals$de_condition <- condition
-
-  updatePickerInput(session = session, inputId = "deVisComparison", choices = comparisons, selected = comparisons)
-  updatePickerInput(session = session, inputId = "deVisAin", choices = ain, selected = ain)
-
-  # check if gene names column empty
-  #rd <- as.data.table(rowData(reactiveVals$se))
-  #if(sum(is.na(rd$Gene.Names)) == nrow(rd)){
-  #  biomarker_col <- c("Protein.IDs")
-  #} else {
-  #  biomarker_col <- c("Protein.IDs", "Gene.Names")
-  #}
-  #updatePickerInput(session = session, inputId =   "deBiomarkerColumn", choices = biomarker_col, selected = biomarker_col[[1]])
-  shinyjs::runjs("openBox('deEvaluation')")
-  shinyjs::runjs("openBox('deOverviewVis')")
+  tryCatch({
+    de_results <- run_DE(reactiveVals$se,
+                         comparisons = comparisons,
+                         ain = ain,
+                         condition = condition,
+                         DE_method = method,
+                         logFC = logfc_b,
+                         logFC_up = logfc,
+                         logFC_down = -logfc,
+                         p_adj = padj_b,
+                         alpha = p,
+                         K = K,
+                         B = B,
+                         DEqMS_PSMs_column = DEqMS_column)
+  
+    # save current settings
+    de_current <- data.table("Method" = c(method),
+                             "Input Data" = c(ain),
+                             "Comparisons" = c(comparisons)
+    )
+    if(method == "ROTS"){
+      de_current$K <- c(K)
+      de_current$B <- c(B)
+    }
+    if(method == "DEqMS"){
+      de_current$DEqMS_column <- c(DEqMS_column)
+    }
+    if(logfc_b){
+      de_current[ , ":=" ("LogFC Thr" = logfc)]
+    }
+    if(padj_b){
+      de_current[ , ":=" ("P.Adj Thr" = p)]
+    } else {
+      de_current[ , ":=" ("P.Value Thr" = p)]
+    }
+  
+    reactiveVals$de_current <- de_current
+    reactiveVals$de_results <- de_results
+    reactiveVals$de_condition <- condition
+  
+    updatePickerInput(session = session, inputId = "deVisComparison", choices = comparisons, selected = comparisons)
+    updatePickerInput(session = session, inputId = "deVisAin", choices = ain, selected = ain)
+  
+    # check if gene names column empty
+    #rd <- as.data.table(rowData(reactiveVals$se))
+    #if(sum(is.na(rd$Gene.Names)) == nrow(rd)){
+    #  biomarker_col <- c("Protein.IDs")
+    #} else {
+    #  biomarker_col <- c("Protein.IDs", "Gene.Names")
+    #}
+    #updatePickerInput(session = session, inputId =   "deBiomarkerColumn", choices = biomarker_col, selected = biomarker_col[[1]])
+    shinyjs::runjs("openBox('deEvaluation')")
+    shinyjs::runjs("openBox('deOverviewVis')")
+  }, error = function(e){
+    shinyalert(
+      inputId = "confirmDEAnalysisFailure",
+      title = "DE Analysis Failed With the Following Message:",
+      text = HTML(sprintf("<b>%s</b>", e$message)),
+      size = "s",
+      closeOnEsc = TRUE,
+      closeOnClickOutside = FALSE,
+      html = TRUE,
+      type = "error",
+      showConfirmButton = FALSE,
+      showCancelButton = TRUE,
+      cancelButtonText = "Close",
+      timer = 5000,
+      imageUrl = "",
+      animation = TRUE,
+      immediate = FALSE
+    )
+  })
   waiter_hide(id ="app")
 })
 
